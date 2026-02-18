@@ -1,0 +1,5 @@
+Id,TeamName,ParentTeam,Description,AreaPaths,Members,Iterations
+,Platform,,Platform Engineering Team,,user1@company.com;user2@company.com,Sprint 1;Sprint 2;Sprint 3
+,Backend,Platform,Backend Services Team,,dev1@company.com;dev2@company.com,Sprint 1;Sprint 2
+,Frontend,Platform,Frontend UI Team,,dev3@company.com,Sprint 1;Sprint 2
+,QA,,Quality Assurance Team,,qa1@company.com;qa2@company.com,Sprint 1;Sprint 2;Sprint 3

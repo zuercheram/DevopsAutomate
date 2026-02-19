@@ -850,6 +850,17 @@ function Invoke-Provision ([array]$OrderedTeams, [array]$AllRows) {
         $scopeDesc = Get-ProjectScopeDescriptor
         $groups    = Get-ProjectGroups $scopeDesc
 
+        # Resolve the built-in "Contributors" group so team members can contribute to boards
+        $contributorsGroup = Find-GroupByDisplayName -DisplayName "Contributors" -Groups $groups
+        $contributorsDesc  = $null
+        if ($contributorsGroup) {
+            $contributorsDesc = $contributorsGroup.descriptor
+            Write-Step "Found built-in 'Contributors' group" -Status INFO
+        }
+        else {
+            Write-Step "Built-in 'Contributors' group not found – members will not be added to Contributors" -Status WARN
+        }
+
         foreach ($team in $OrderedTeams) {
             $desiredEmails = @()
             if ($team.Members) {
@@ -889,6 +900,17 @@ function Invoke-Provision ([array]$OrderedTeams, [array]$AllRows) {
                     }
                     Add-GroupMember -MemberDescriptor $user.descriptor -GroupDescriptor $groupDesc
                     Write-Step "Added '$email' to '$($team.TeamName)'" -Status CREATE
+
+                    # Also add to the built-in Contributors group for board access
+                    if ($contributorsDesc) {
+                        try {
+                            Add-GroupMember -MemberDescriptor $user.descriptor -GroupDescriptor $contributorsDesc
+                            Write-Step "Added '$email' to 'Contributors'" -Status CREATE
+                        }
+                        catch {
+                            Write-Step "Could not add '$email' to 'Contributors': $_" -Status WARN
+                        }
+                    }
                 }
                 catch {
                     Write-Step "Failed to add '$email' to '$($team.TeamName)': $_" -Status ERROR
